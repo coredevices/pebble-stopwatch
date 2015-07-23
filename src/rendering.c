@@ -1,11 +1,3 @@
-// FILENAME :        rendering.c
-//
-// DESCRIPTION :
-//      Renders the LECO font onto a layer at any font size (height of font)
-//      specified. Enables zooming fonts and anti-aliasing.
-//
-// AUTHOR :     Eric Phillips        START DATE :    07/17/15
-
 #include <pebble.h>
 #include "rendering.h"
 
