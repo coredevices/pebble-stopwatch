@@ -29,7 +29,6 @@ typedef struct {
   Layer           *drawing_layer;   //< layer for drawing everything on
   ActionBarLayer  *action_bar;      //< layer to receive clicks
 
-  GFont           *font_large;      //< modified LECO regular font
   GFont           *font_small;      //< modified LECO regular font
   GBitmap         *icon_down;       //< icon for scroll down button
   GBitmap         *icon_lap;        //< icon for lap button
@@ -37,8 +36,6 @@ typedef struct {
   GBitmap         *icon_play;       //< icon for play button
   GBitmap         *icon_reset;      //< icon for reset button
   GBitmap         *icon_up;         //< icon for reset button
-  GBitmap         *image_bottom;    //< image to display at bottom of list
-  GBitmap         *image_dashed;    //< dashed line image for separator
 
   int64_t         epochs_ms[DATA_MAX_LAP_COUNT + 2]; //< memory for timing, with first element
                                     //< being current time, and second current lap
@@ -406,8 +403,6 @@ static void prv_window_load(Window *window) {
     // load persistent state
     prv_load_persistent_storage(data);
     // load resources
-    data->font_large = fonts_load_custom_font(
-      resource_get_handle(RESOURCE_ID_FONT_LECO_REGULAR_SUBSET_36));
     data->font_small = fonts_load_custom_font(
       resource_get_handle(RESOURCE_ID_FONT_LECO_REGULAR_SUBSET_16));
     data->icon_down = gbitmap_create_with_resource(RESOURCE_ID_ICON_DOWN);
@@ -416,8 +411,6 @@ static void prv_window_load(Window *window) {
     data->icon_play = gbitmap_create_with_resource(RESOURCE_ID_ICON_PLAY);
     data->icon_reset = gbitmap_create_with_resource(RESOURCE_ID_ICON_RESET);
     data->icon_up = gbitmap_create_with_resource(RESOURCE_ID_ICON_UP);
-    data->image_bottom = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BOTTOM_LIST);
-    data->image_dashed = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_DASHED_LINE);
     // create layer
     // IMPORTANT: must be created with data for the WindowData pointer
     // so that the data can be accessed in the layer_update_proc callback
@@ -458,7 +451,6 @@ static void prv_window_unload(Window *window) {
     action_bar_layer_destroy(data->action_bar);
     layer_destroy(data->drawing_layer);
     // unload resources
-    fonts_unload_custom_font(data->font_large);
     fonts_unload_custom_font(data->font_small);
     gbitmap_destroy(data->icon_down);
     gbitmap_destroy(data->icon_lap);
@@ -466,8 +458,6 @@ static void prv_window_unload(Window *window) {
     gbitmap_destroy(data->icon_play);
     gbitmap_destroy(data->icon_reset);
     gbitmap_destroy(data->icon_up);
-    gbitmap_destroy(data->image_bottom);
-    gbitmap_destroy(data->image_dashed);
     // window
     window_destroy(window);
     free(data);

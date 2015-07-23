@@ -15,12 +15,6 @@
       {
         "characterRegex": "[0-9: .]",
         "type": "font",
-        "name": "FONT_LECO_REGULAR_SUBSET_36",
-        "file": "fonts/leco_regular_monospaced.otf"
-      },
-      {
-        "characterRegex": "[0-9: .]",
-        "type": "font",
         "name": "FONT_LECO_REGULAR_SUBSET_16",
         "file": "fonts/leco_regular_monospaced.otf"
       },
@@ -94,30 +88,6 @@
         "type": "png",
         "name": "ICON_UP",
         "file": "images/icon_up.png",
-        "targetPlatforms": ["basalt"]
-      },
-      {
-        "type": "png",
-        "name": "IMAGE_BOTTOM_LIST",
-        "file": "images/image_bottom_list_bw.png",
-        "targetPlatforms": ["aplite"]
-      },
-      {
-        "type": "png",
-        "name": "IMAGE_BOTTOM_LIST",
-        "file": "images/image_bottom_list.png",
-        "targetPlatforms": ["basalt"]
-      },
-      {
-        "type": "png",
-        "name": "IMAGE_DASHED_LINE",
-        "file": "images/image_dashed_line_bw.png",
-        "targetPlatforms": ["aplite"]
-      },
-      {
-        "type": "png",
-        "name": "IMAGE_DASHED_LINE",
-        "file": "images/image_dashed_line.png",
         "targetPlatforms": ["basalt"]
       },
       {
