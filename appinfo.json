@@ -1,0 +1,131 @@
+{
+  "uuid": "14bd9cd3-14dc-4b81-bd58-2f1fb9b57978",
+  "shortName": "Stopwatch",
+  "longName": "Stopwatch V4",
+  "companyName": "Pebble",
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {},
+  "resources": {
+    "media": [
+      {
+        "characterRegex": "[0-9: .]",
+        "type": "font",
+        "name": "FONT_LECO_REGULAR_SUBSET_36",
+        "file": "fonts/leco_regular_monospaced.otf"
+      },
+      {
+        "characterRegex": "[0-9: .]",
+        "type": "font",
+        "name": "FONT_LECO_REGULAR_SUBSET_16",
+        "file": "fonts/leco_regular_monospaced.otf"
+      },
+      {
+        "type": "png",
+        "name": "ICON_DOWN",
+        "file": "images/icon_down_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_DOWN",
+        "file": "images/icon_down.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_LAP",
+        "file": "images/icon_lap_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_LAP",
+        "file": "images/icon_lap.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_PAUSE",
+        "file": "images/icon_pause_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_PAUSE",
+        "file": "images/icon_pause.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_PLAY",
+        "file": "images/icon_play_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_PLAY",
+        "file": "images/icon_play.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_RESET",
+        "file": "images/icon_reset_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_RESET",
+        "file": "images/icon_reset.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_UP",
+        "file": "images/icon_up_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "ICON_UP",
+        "file": "images/icon_up.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_BOTTOM_LIST",
+        "file": "images/image_bottom_list_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_BOTTOM_LIST",
+        "file": "images/image_bottom_list.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_DASHED_LINE",
+        "file": "images/image_dashed_line_bw.png",
+        "targetPlatforms": ["aplite"]
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_DASHED_LINE",
+        "file": "images/image_dashed_line.png",
+        "targetPlatforms": ["basalt"]
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ICON",
+        "file": "images/system_icon.png",
+        "menuIcon": true
+      }
+      ]
+  }
+}
