@@ -96,9 +96,7 @@ void rendering_draw_text(GContext *ctx, char *text, uint8_t size, uint16_t font_
           gpath_draw_outline(ctx, &path);
           // recalculate character origin (top left)
           cur_origin.x += (LECO_CHARS[char_idx]->char_width +
-            ((LECO_CHARS[char_idx]->char_width == 0) ?
-              0 :
-              FONT_CHARACTER_DEFINITION_KERNING)) *
+            ((LECO_CHARS[char_idx]->char_width == 0) ? 0 : FONT_CHARACTER_DEFINITION_KERNING)) *
             font_size / FONT_CHARACTER_DEFINITION_HEIGHT;
           break;
          }
@@ -129,13 +127,11 @@ uint32_t rendering_get_size(char *buff, uint8_t font_size) {
     for (uint8_t char_idx = 0; char_idx < ARRAY_LENGTH(LECO_CHARS); char_idx++) {
       if (LECO_CHARS[char_idx]->character == buff[txt_idx]) {
         if (LECO_CHARS[char_idx]->character == ':') {
-          tot_width += (LECO_P.char_width +
-            FONT_CHARACTER_DEFINITION_KERNING) *
+          tot_width += (LECO_P.char_width + FONT_CHARACTER_DEFINITION_KERNING) *
             font_size / FONT_CHARACTER_DEFINITION_HEIGHT;
         }
         else {
-          tot_width += (LECO_CHARS[char_idx]->char_width +
-            FONT_CHARACTER_DEFINITION_KERNING) *
+          tot_width += (LECO_CHARS[char_idx]->char_width + FONT_CHARACTER_DEFINITION_KERNING) *
             font_size / FONT_CHARACTER_DEFINITION_HEIGHT;
         }
         break;
@@ -143,7 +139,8 @@ uint32_t rendering_get_size(char *buff, uint8_t font_size) {
     }
   }
   // remove final kerning spacing
-  if (tot_width > 0) tot_width -= FONT_CHARACTER_DEFINITION_KERNING *
-            font_size / FONT_CHARACTER_DEFINITION_HEIGHT;
+  if (tot_width > 0) {
+    tot_width -= FONT_CHARACTER_DEFINITION_KERNING * font_size / FONT_CHARACTER_DEFINITION_HEIGHT;
+  }
   return tot_width;
 }

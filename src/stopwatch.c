@@ -5,16 +5,16 @@
 #define PERSIST_DATA_VERSION 1 // the current version of the data. Increment this if changing format
 #define PERSIST_DATA_VERSION_KEY 0
 
-#define DURATION_SEC_MS 1000
-#define DURATION_MIN_MS 60000
-#define DURATION_HR_MS 3600000
+#define MSEC_IN_SEC 1000
+#define MSEC_IN_MIN 60000
+#define MSEC_IN_HR 3600000
 
 #define DATA_MAX_LAP_COUNT 22
 #define SCREEN_LAP_HEIGHT 18
 #define SCREEN_LAP_FONT_SIZE 12
 #define SCREEN_SCROLLING_OFF 30
 #define SCREEN_SCROLL_STEP_SMALL 6
-#define SCREEN_SCROLL_STEP_LARGE 12
+#define SCREEN_SCROLL_STEP_LARGE 18
 #define SCREEN_BORDER_WIDTH 4
 #define SCREEN_SPACING_WIDTH 4
 #define SCREEN_MAX_LAPS_BEFORE_SCROLLING 6
@@ -56,20 +56,20 @@ static int64_t prv_get_epoch_ms(void) {
   time_t sec;
   uint16_t msec;
   time_ms(&sec, &msec);
-  return (int64_t)sec * 1000 + (int64_t)msec;
+  return (int64_t)sec * MSEC_IN_SEC + (int64_t)msec;
 }
 
 // format a millisecond duration into text
 static void prv_format_duration_ms(char *buff_main, char *buff_ms, uint8_t size_main,
                                    uint8_t size_ms, int64_t duration, bool one_line) {
   // get time parts
-  int hr = duration / DURATION_HR_MS;
-  int min = (duration % DURATION_HR_MS) / DURATION_MIN_MS;
-  int sec = (duration % DURATION_MIN_MS) / DURATION_SEC_MS;
-  int mil = duration % DURATION_SEC_MS / 10;
+  int hr = duration / MSEC_IN_HR;
+  int min = (duration % MSEC_IN_HR) / MSEC_IN_MIN;
+  int sec = (duration % MSEC_IN_MIN) / MSEC_IN_SEC;
+  int csec = duration % MSEC_IN_SEC / 10;
   // format into string
   if (one_line) {
-    snprintf(buff_main, size_main, "%d:%02d:%02d.%02d", hr, min, sec, mil);
+    snprintf(buff_main, size_main, "%d:%02d:%02d.%02d", hr, min, sec, csec);
     return;
   }
   if (hr > 0) {
@@ -83,14 +83,12 @@ static void prv_format_duration_ms(char *buff_main, char *buff_ms, uint8_t size_
   else {
     snprintf(buff_main, size_main, "%02d.", sec);
   }
-  snprintf(buff_ms, size_ms, "%02d", mil);
+  snprintf(buff_ms, size_ms, "%02d", csec);
 }
 
 // get if enough laps to scroll
 static bool prv_get_scrolling_enabled(WindowData *data) {
   return (data->lap_count > SCREEN_MAX_LAPS_BEFORE_SCROLLING);
-  // return (data->total_height_ani - data->total_height_off + SCREEN_LAP_HEIGHT >
-  //   layer_get_bounds(data->drawing_layer).size.h);
 }
 
 // get if scrolled to start
@@ -121,18 +119,30 @@ static void prv_update_icons(WindowData *data) {
   // check if paused
   if (data->epochs_ms[0] > 0) {
     action_bar_layer_set_icon(data->action_bar, BUTTON_ID_SELECT, data->icon_pause);
-    action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_reset);
-    action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_lap);
+    action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_lap);
+    action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
+#ifdef PBL_SDK_3
+    action_bar_layer_set_icon_press_animation(data->action_bar, BUTTON_ID_UP,
+                                              ActionBarLayerIconPressAnimationMoveLeft);
+    action_bar_layer_set_icon_press_animation(data->action_bar, BUTTON_ID_DOWN,
+                                              ActionBarLayerIconPressAnimationMoveLeft);
+#endif
   }
   else {
     action_bar_layer_set_icon(data->action_bar, BUTTON_ID_SELECT, data->icon_play);
     if (prv_get_scrolling_enabled(data)) {
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_up);
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_down);
+#ifdef PBL_SDK_3
+      action_bar_layer_set_icon_press_animation(data->action_bar, BUTTON_ID_UP,
+                                                ActionBarLayerIconPressAnimationMoveUp);
+      action_bar_layer_set_icon_press_animation(data->action_bar, BUTTON_ID_DOWN,
+                                                ActionBarLayerIconPressAnimationMoveDown);
+#endif
     }
     else {
       action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_UP);
-      action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_DOWN);
+      action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
     }
   }
 }
@@ -221,10 +231,12 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   struct tm *tick_time = localtime(&tmp_sec);
   tick_time->tm_hour = (tick_time->tm_hour % 12 == 0) ? 12 : (tick_time->tm_hour % 12);
   char buff[] = "00:00";
-  if (clock_is_24h_style())
+  if (clock_is_24h_style()) {
     strftime(buff, sizeof(buff), "%k:%M", tick_time);
-  else
+  }
+  else {
     strftime(buff, sizeof(buff), "%l:%M", tick_time);
+  }
   graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
     GRect(0, -3, screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 }
@@ -243,8 +255,7 @@ static void prv_app_timer_callback(void *callback_data) {
 
   // check if in fast refresh mode
   uint16_t refresh_ms = 80;
-  if (old_ani == data->total_height_ani &&
-      old_off == data->total_height_off &&
+  if (old_ani == data->total_height_ani && old_off == data->total_height_off &&
       data->epochs_ms[0] <= 0) {
     refresh_ms = 1000;
   }
@@ -265,13 +276,23 @@ static void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
   WindowData *data = (WindowData*)context;
   // check if paused
   if (data->epochs_ms[0] > 0) {
-    // reset stopwatch
-    data->epochs_ms[0] = 0;
-    data->epochs_ms[1] = 0;
-    data->lap_count = 0;
-    data->total_height_ani = 0;
+    // no repeating laps
+    if (click_number_of_clicks_counted(recognizer) > 1) {
+      return;
+    }
+    // move other lap's memory, overwriting the oldest
+    memmove(&data->epochs_ms[3], &data->epochs_ms[2],
+      sizeof(data->epochs_ms[0]) * (ARRAY_LENGTH(data->epochs_ms) - 3));
+    // lap math
+    int64_t cur_epoch_ms = prv_get_epoch_ms();
+    data->epochs_ms[2] = cur_epoch_ms - (data->epochs_ms[1] + cur_epoch_ms) % cur_epoch_ms;
+    data->epochs_ms[1] = cur_epoch_ms;
+    if (++data->lap_count > DATA_MAX_LAP_COUNT) {
+      data->lap_count = DATA_MAX_LAP_COUNT;
+      data->total_height_ani -= SCREEN_LAP_HEIGHT;
+    }
+    // scroll to top
     data->total_height_off = 0;
-    prv_update_icons(data);
   }
   else if (prv_get_scrolling_enabled(data)) {
     if (click_number_of_clicks_counted(recognizer) > 1) {
@@ -308,26 +329,16 @@ static void prv_select_click_handler(ClickRecognizerRef recognizer, void *contex
 static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context) {
   WindowData *data = (WindowData*)context;
   // check if paused
-  if (data->epochs_ms[0] > 0) {
-    // no repeating laps
-    if (click_number_of_clicks_counted(recognizer) > 1) {
-      return;
-    }
-    // move other lap's memory, overwriting the oldest
-    memmove(&data->epochs_ms[3], &data->epochs_ms[2],
-      sizeof(data->epochs_ms[0]) * (ARRAY_LENGTH(data->epochs_ms) - 3));
-    // lap math
-    int64_t cur_epoch_ms = prv_get_epoch_ms();
-    data->epochs_ms[2] = cur_epoch_ms - (data->epochs_ms[1] + cur_epoch_ms) % cur_epoch_ms;
-    data->epochs_ms[1] = cur_epoch_ms;
-    if (++data->lap_count > DATA_MAX_LAP_COUNT) {
-      data->lap_count = DATA_MAX_LAP_COUNT;
-      data->total_height_ani -= SCREEN_LAP_HEIGHT;
-    }
-    // scroll to top
+  if (data->epochs_ms[0] > 0 || !prv_get_scrolling_enabled(data)) {
+    // reset stopwatch
+    data->epochs_ms[0] = 0;
+    data->epochs_ms[1] = 0;
+    data->lap_count = 0;
+    data->total_height_ani = 0;
     data->total_height_off = 0;
+    prv_update_icons(data);
   }
-  else if (prv_get_scrolling_enabled(data)) {
+  else {
     if (click_number_of_clicks_counted(recognizer) > 1) {
       data->total_height_off -= SCREEN_SCROLL_STEP_SMALL;
     }
@@ -424,7 +435,7 @@ static void prv_window_load(Window *window) {
     action_bar_layer_set_context(data->action_bar, data);
     action_bar_layer_set_click_config_provider(data->action_bar, prv_click_config_provider);
     prv_update_icons(data);
-    if (data->lap_count > 6 && data->epochs_ms[0] < 0) {
+    if (data->lap_count > SCREEN_MAX_LAPS_BEFORE_SCROLLING && data->epochs_ms[0] < 0) {
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_up);
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_down);
     }

@@ -10,7 +10,7 @@
 //! @param font_size the font size to draw it at
 //! @param position the position to draw at
 void rendering_draw_text(GContext *ctx, char *text, uint8_t size, uint16_t font_size,
-    GPoint position);
+                         GPoint position);
 
 
 //! gets the width a font will be when rendered
