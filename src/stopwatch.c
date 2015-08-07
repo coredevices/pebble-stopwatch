@@ -142,7 +142,11 @@ static void prv_update_icons(WindowData *data) {
     }
     else {
       action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_UP);
-      action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
+      if (data->epochs_ms[0] == 0) {
+        action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_DOWN);
+      } else {
+        action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
+      }
     }
   }
 }
@@ -330,6 +334,11 @@ static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context)
   WindowData *data = (WindowData*)context;
   // check if paused
   if (data->epochs_ms[0] > 0 || !prv_get_scrolling_enabled(data)) {
+    // exit if no time
+    if (data->epochs_ms[0] == 0) {
+      return;
+    }
+
     // reset stopwatch
     data->epochs_ms[0] = 0;
     data->epochs_ms[1] = 0;
