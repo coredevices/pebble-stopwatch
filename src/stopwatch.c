@@ -24,6 +24,9 @@
 #define HIGHLIGHT_COLOR GColorWhite
 #endif
 
+// lap identifiers
+typedef enum {CurrentTime, CurrentLap, FirstLapHistory} Lap;
+
 // window data structure, removes all global variables!
 typedef struct {
   Layer           *drawing_layer;   //< layer for drawing everything on
@@ -117,7 +120,7 @@ static int32_t prv_get_scrolling_end_offset(WindowData *data) {
 // update all button icons
 static void prv_update_icons(WindowData *data) {
   // check if paused
-  if (data->epochs_ms[0] > 0) {
+  if (data->epochs_ms[CurrentTime] > 0) {
     action_bar_layer_set_icon(data->action_bar, BUTTON_ID_SELECT, data->icon_pause);
     action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_lap);
     action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
@@ -142,7 +145,7 @@ static void prv_update_icons(WindowData *data) {
     }
     else {
       action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_UP);
-      if (data->epochs_ms[0] == 0) {
+      if (data->epochs_ms[CurrentTime] == 0) {
         action_bar_layer_clear_icon(data->action_bar, BUTTON_ID_DOWN);
       } else {
         action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_reset);
@@ -163,8 +166,8 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
 
   // get duration
   int64_t duration = prv_get_epoch_ms();
-  if (data->epochs_ms[0] != 0 && data->epochs_ms[0] != duration) {
-    duration -= (data->epochs_ms[0] + duration) % duration;
+  if (data->epochs_ms[CurrentTime] != 0 && data->epochs_ms[CurrentTime] != duration) {
+    duration -= (data->epochs_ms[CurrentTime] + duration) % duration;
   }
   else {
     duration = 0;
@@ -260,7 +263,7 @@ static void prv_app_timer_callback(void *callback_data) {
   // check if in fast refresh mode
   uint16_t refresh_ms = 80;
   if (old_ani == data->total_height_ani && old_off == data->total_height_off &&
-      data->epochs_ms[0] <= 0) {
+      data->epochs_ms[CurrentTime] <= 0) {
     refresh_ms = 1000;
   }
   old_ani = data->total_height_ani;
@@ -279,18 +282,19 @@ static void prv_app_timer_callback(void *callback_data) {
 static void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
   WindowData *data = (WindowData*)context;
   // check if paused
-  if (data->epochs_ms[0] > 0) {
+  if (data->epochs_ms[CurrentTime] > 0) {
     // no repeating laps
     if (click_number_of_clicks_counted(recognizer) > 1) {
       return;
     }
     // move other lap's memory, overwriting the oldest
-    memmove(&data->epochs_ms[3], &data->epochs_ms[2],
-      sizeof(data->epochs_ms[0]) * (ARRAY_LENGTH(data->epochs_ms) - 3));
+    memmove(&data->epochs_ms[FirstLapHistory + 1], &data->epochs_ms[FirstLapHistory],
+      sizeof(data->epochs_ms[CurrentTime]) * (ARRAY_LENGTH(data->epochs_ms) - 3));
     // lap math
     int64_t cur_epoch_ms = prv_get_epoch_ms();
-    data->epochs_ms[2] = cur_epoch_ms - (data->epochs_ms[1] + cur_epoch_ms) % cur_epoch_ms;
-    data->epochs_ms[1] = cur_epoch_ms;
+    data->epochs_ms[FirstLapHistory] = cur_epoch_ms - (data->epochs_ms[CurrentLap] + cur_epoch_ms) %
+      cur_epoch_ms;
+    data->epochs_ms[CurrentLap] = cur_epoch_ms;
     if (++data->lap_count > DATA_MAX_LAP_COUNT) {
       data->lap_count = DATA_MAX_LAP_COUNT;
       data->total_height_ani -= SCREEN_LAP_HEIGHT;
@@ -314,15 +318,15 @@ static void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
 static void prv_select_click_handler(ClickRecognizerRef recognizer, void *context) {
   WindowData *data = (WindowData*)context;
   // play or pause the stopwatch
-  if (data->epochs_ms[0] <= 0) {
+  if (data->epochs_ms[CurrentTime] <= 0) {
     // un-pause the stopwatch
-    data->epochs_ms[0] += prv_get_epoch_ms();
-    data->epochs_ms[1] += prv_get_epoch_ms();
+    data->epochs_ms[CurrentTime] += prv_get_epoch_ms();
+    data->epochs_ms[CurrentLap] += prv_get_epoch_ms();
   }
   else {
     // pause the stopwatch
-    data->epochs_ms[0] -= prv_get_epoch_ms();
-    data->epochs_ms[1] -= prv_get_epoch_ms();
+    data->epochs_ms[CurrentTime] -= prv_get_epoch_ms();
+    data->epochs_ms[CurrentLap] -= prv_get_epoch_ms();
   }
   prv_update_icons(data);
 
@@ -333,15 +337,15 @@ static void prv_select_click_handler(ClickRecognizerRef recognizer, void *contex
 static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context) {
   WindowData *data = (WindowData*)context;
   // check if paused
-  if (data->epochs_ms[0] > 0 || !prv_get_scrolling_enabled(data)) {
+  if (data->epochs_ms[CurrentTime] > 0 || !prv_get_scrolling_enabled(data)) {
     // exit if no time
-    if (data->epochs_ms[0] == 0) {
+    if (data->epochs_ms[CurrentTime] == 0) {
       return;
     }
 
     // reset stopwatch
-    data->epochs_ms[0] = 0;
-    data->epochs_ms[1] = 0;
+    data->epochs_ms[CurrentTime] = 0;
+    data->epochs_ms[CurrentLap] = 0;
     data->lap_count = 0;
     data->total_height_ani = 0;
     data->total_height_off = 0;
@@ -444,7 +448,7 @@ static void prv_window_load(Window *window) {
     action_bar_layer_set_context(data->action_bar, data);
     action_bar_layer_set_click_config_provider(data->action_bar, prv_click_config_provider);
     prv_update_icons(data);
-    if (data->lap_count > SCREEN_MAX_LAPS_BEFORE_SCROLLING && data->epochs_ms[0] < 0) {
+    if (data->lap_count > SCREEN_MAX_LAPS_BEFORE_SCROLLING && data->epochs_ms[CurrentTime] < 0) {
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_UP, data->icon_up);
       action_bar_layer_set_icon(data->action_bar, BUTTON_ID_DOWN, data->icon_down);
     }
