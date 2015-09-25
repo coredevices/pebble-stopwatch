@@ -164,6 +164,8 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // get WindowData pointer from layer data
   WindowData *data = (*(WindowData**)layer_get_data(layer));
 
+  GRect bounds = layer_get_bounds(layer);
+
   // get duration
   int64_t duration = prv_get_epoch_ms();
   if (data->epochs_ms[CurrentTime] != 0 && data->epochs_ms[CurrentTime] != duration) {
@@ -177,7 +179,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   char buff_ms[15];
   prv_format_duration_ms(buff_main, buff_ms, sizeof(buff_main), sizeof(buff_ms), duration, false);
   // get coordinates and scaled sizes
-  int32_t screen_width = layer_get_bounds(layer).size.w - ACTION_BAR_WIDTH;
+  int32_t screen_width = bounds.size.w - ACTION_BAR_WIDTH;
   int32_t main_max_width = rendering_get_size(buff_main, 255);
   int32_t ms_max_width = rendering_get_size(buff_ms, 255);
   int32_t main_font_size;
@@ -205,7 +207,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   int32_t main_width = rendering_get_size(buff_main, main_font_size);
   int32_t ms_width = rendering_get_size(buff_ms, ms_font_size);
   int32_t x_offset = (screen_width - (main_width + ms_width + SCREEN_SPACING_WIDTH)) / 2;
-  int32_t y_offset = layer_get_bounds(layer).size.h / 2 - data->total_height_ani / 2;
+  int32_t y_offset = bounds.size.h / 2 - data->total_height_ani / 2;
   // lock main text position once laps go off screen
   if (prv_get_scrolling_enabled(data)) {
     y_offset = 15;
