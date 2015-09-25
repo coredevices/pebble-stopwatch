@@ -32,7 +32,7 @@ typedef struct {
   Layer           *drawing_layer;   //< layer for drawing everything on
   ActionBarLayer  *action_bar;      //< layer to receive clicks
 
-  GFont           *font_small;      //< modified LECO regular font
+  GFont           font_small;      //< modified LECO regular font
   GBitmap         *icon_down;       //< icon for scroll down button
   GBitmap         *icon_lap;        //< icon for lap button
   GBitmap         *icon_pause;      //< icon for pause button
@@ -220,7 +220,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
     // print to string
     prv_format_duration_ms(buff_lap, NULL, sizeof(buff_lap), 0, data->epochs_ms[ii], true);
     // draw on screen
-    graphics_draw_text(ctx, buff_lap, data->font_small,GRect(5, y - 8, screen_width,
+    graphics_draw_text(ctx, buff_lap, data->font_small, GRect(5, y - 8, screen_width,
       SCREEN_LAP_HEIGHT), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   }
   // draw the text
