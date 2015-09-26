@@ -251,7 +251,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
       GRect(0, -3, screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
   #elif PBL_ROUND
     graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
-      GRect(0, 0, bounds.size.w, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+      GRect(0, 3, bounds.size.w, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
   #endif
 }
 
