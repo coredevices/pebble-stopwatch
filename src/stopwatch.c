@@ -10,12 +10,20 @@
 #define MSEC_IN_HR 3600000
 
 #define DATA_MAX_LAP_COUNT 22
-#define SCREEN_LAP_HEIGHT 18
+#if defined(PBL_RECT)
+  #define SCREEN_LAP_HEIGHT 18
+#elif defined(PBL_ROUND)
+  #define SCREEN_LAP_HEIGHT 14
+#endif
 #define SCREEN_LAP_FONT_SIZE 12
 #define SCREEN_SCROLLING_OFF 30
 #define SCREEN_SCROLL_STEP_SMALL 6
 #define SCREEN_SCROLL_STEP_LARGE 18
-#define SCREEN_BORDER_WIDTH 4
+#if defined(PBL_RECT)
+  #define SCREEN_BORDER_WIDTH 4
+#elif defined(PBL_ROUND)
+  #define SCREEN_BORDER_WIDTH 22
+#endif
 #define SCREEN_SPACING_WIDTH 4
 #define SCREEN_MAX_LAPS_BEFORE_SCROLLING 6
 #ifdef PBL_COLOR
@@ -223,7 +231,8 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
     prv_format_duration_ms(buff_lap, NULL, sizeof(buff_lap), 0, data->epochs_ms[ii], true);
     // draw on screen
     graphics_draw_text(ctx, buff_lap, data->font_small, GRect(5, y - 8, screen_width,
-      SCREEN_LAP_HEIGHT), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+      SCREEN_LAP_HEIGHT), GTextOverflowModeFill,
+      PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter), NULL);
   }
   // draw the text
   graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
