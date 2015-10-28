@@ -247,6 +247,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   }
 
   #if defined(PBL_ROUND)
+    // Draw a box under the laps to cover the bottom laps
     graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
     graphics_fill_rect(ctx, GRect(0, 156, 180, 24), 0, GCornerNone);
   #endif
