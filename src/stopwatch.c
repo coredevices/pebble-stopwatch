@@ -10,14 +10,14 @@
 #define MSEC_IN_HR 3600000
 
 #define DATA_MAX_LAP_COUNT 22
-#define SCREEN_LAP_HEIGHT 18
+#define SCREEN_LAP_HEIGHT PBL_IF_ROUND_ELSE(14, 18)
 #define SCREEN_LAP_FONT_SIZE 12
-#define SCREEN_SCROLLING_OFF 30
+#define SCREEN_SCROLLING_OFF PBL_IF_ROUND_ELSE(86, 30)
 #define SCREEN_SCROLL_STEP_SMALL 6
 #define SCREEN_SCROLL_STEP_LARGE 18
-#define SCREEN_BORDER_WIDTH 4
+#define SCREEN_BORDER_WIDTH PBL_IF_ROUND_ELSE(22, 4)
 #define SCREEN_SPACING_WIDTH 4
-#define SCREEN_MAX_LAPS_BEFORE_SCROLLING 6
+#define SCREEN_MAX_LAPS_BEFORE_SCROLLING PBL_IF_ROUND_ELSE(5, 6)
 #ifdef PBL_COLOR
 #define HIGHLIGHT_COLOR GColorYellow
 #else
@@ -32,7 +32,7 @@ typedef struct {
   Layer           *drawing_layer;   //< layer for drawing everything on
   ActionBarLayer  *action_bar;      //< layer to receive clicks
 
-  GFont           *font_small;      //< modified LECO regular font
+  GFont           font_small;      //< modified LECO regular font
   GBitmap         *icon_down;       //< icon for scroll down button
   GBitmap         *icon_lap;        //< icon for lap button
   GBitmap         *icon_pause;      //< icon for pause button
@@ -164,6 +164,8 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // get WindowData pointer from layer data
   WindowData *data = (*(WindowData**)layer_get_data(layer));
 
+  const GRect bounds = layer_get_bounds(layer);
+
   // get duration
   int64_t duration = prv_get_epoch_ms();
   if (data->epochs_ms[CurrentTime] != 0 && data->epochs_ms[CurrentTime] != duration) {
@@ -177,7 +179,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   char buff_ms[15];
   prv_format_duration_ms(buff_main, buff_ms, sizeof(buff_main), sizeof(buff_ms), duration, false);
   // get coordinates and scaled sizes
-  int32_t screen_width = layer_get_bounds(layer).size.w - ACTION_BAR_WIDTH;
+  int32_t screen_width = bounds.size.w - ACTION_BAR_WIDTH;
   int32_t main_max_width = rendering_get_size(buff_main, 255);
   int32_t ms_max_width = rendering_get_size(buff_ms, 255);
   int32_t main_font_size;
@@ -205,10 +207,13 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   int32_t main_width = rendering_get_size(buff_main, main_font_size);
   int32_t ms_width = rendering_get_size(buff_ms, ms_font_size);
   int32_t x_offset = (screen_width - (main_width + ms_width + SCREEN_SPACING_WIDTH)) / 2;
-  int32_t y_offset = layer_get_bounds(layer).size.h / 2 - data->total_height_ani / 2;
+  int32_t y_offset = bounds.size.h / 2 - data->total_height_ani / 2;
   // lock main text position once laps go off screen
   if (prv_get_scrolling_enabled(data)) {
-    y_offset = 15;
+    y_offset = PBL_IF_RECT_ELSE(15, 43);
+    if (data->total_height_off > 0) {
+      data->total_height_off = 0;
+    }
   }
 
   // draw laps
@@ -220,13 +225,21 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
     // print to string
     prv_format_duration_ms(buff_lap, NULL, sizeof(buff_lap), 0, data->epochs_ms[ii], true);
     // draw on screen
-    graphics_draw_text(ctx, buff_lap, data->font_small,GRect(5, y - 8, screen_width,
-      SCREEN_LAP_HEIGHT), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+    graphics_draw_text(ctx, buff_lap, data->font_small, GRect(5, y - 8, screen_width,
+      SCREEN_LAP_HEIGHT), GTextOverflowModeFill,
+      PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter), NULL);
   }
+
+#if defined(PBL_ROUND)
+    // Draw a box under the laps to cover the bottom laps
+    graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
+    graphics_fill_rect(ctx, GRect(0, 156, 180, 24), 0, GCornerNone);
+#endif
+
   // draw the text
   graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
-  graphics_fill_rect(ctx, GRect(0, 0, screen_width, y_offset + main_font_size + 5),
-    1, GCornerNone);
+  graphics_fill_rect(ctx,
+                     GRect(0, 0, screen_width, y_offset + main_font_size + 5), 1, GCornerNone);
   graphics_context_set_fill_color(ctx, GColorBlack);
   rendering_draw_text(ctx, buff_main, sizeof(buff_main), main_font_size,
     GPoint(x_offset, y_offset));
@@ -244,8 +257,10 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   else {
     strftime(buff, sizeof(buff), "%l:%M", tick_time);
   }
+  const int time_y_offset = PBL_IF_RECT_ELSE(-3, 1);
+  const int time_screen_width = PBL_IF_RECT_ELSE(screen_width, bounds.size.w);
   graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
-    GRect(0, -3, screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+    GRect(0, time_y_offset, time_screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 }
 
 

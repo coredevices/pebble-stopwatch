@@ -3,9 +3,9 @@
   "shortName": "Stopwatch",
   "longName": "Stopwatch",
   "companyName": "Pebble",
-  "versionLabel": "1.0",
+  "versionLabel": "1.1",
   "sdkVersion": "3",
-  "targetPlatforms": ["aplite", "basalt"],
+  "targetPlatforms": ["aplite", "basalt", "chalk"],
   "watchapp": {
     "watchface": false
   },
@@ -28,7 +28,7 @@
         "type": "png",
         "name": "ICON_DOWN",
         "file": "images/icon_down.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
@@ -40,7 +40,7 @@
         "type": "png",
         "name": "ICON_LAP",
         "file": "images/icon_lap.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
@@ -52,7 +52,7 @@
         "type": "png",
         "name": "ICON_PAUSE",
         "file": "images/icon_pause.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
@@ -64,7 +64,7 @@
         "type": "png",
         "name": "ICON_PLAY",
         "file": "images/icon_play.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
@@ -76,7 +76,7 @@
         "type": "png",
         "name": "ICON_RESET",
         "file": "images/icon_reset.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
@@ -88,7 +88,7 @@
         "type": "png",
         "name": "ICON_UP",
         "file": "images/icon_up.png",
-        "targetPlatforms": ["basalt"]
+        "targetPlatforms": ["basalt", "chalk"]
       },
       {
         "type": "png",
