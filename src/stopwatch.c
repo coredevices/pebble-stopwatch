@@ -227,8 +227,9 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // lock main text position once laps go off screen
   if (prv_get_scrolling_enabled(data)) {
     y_offset = PBL_IF_RECT_ELSE(15, 43);
-    if (data->total_height_off > 0)
+    if (data->total_height_off > 0) {
       data->total_height_off = 0;
+    }
   }
 
   // draw laps
