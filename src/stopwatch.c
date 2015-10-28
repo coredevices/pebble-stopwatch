@@ -206,7 +206,8 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // calculate screen coordinates
   int32_t main_width = rendering_get_size(buff_main, main_font_size);
   int32_t ms_width = rendering_get_size(buff_ms, ms_font_size);
-  int32_t x_offset = (screen_width - (main_width + ms_width + SCREEN_SPACING_WIDTH)) / 2;
+  int32_t x_offset = (screen_width - (main_width + ms_width + SCREEN_SPACING_WIDTH)) / 2
+                     + PBL_IF_RECT_ELSE(0, 10);
   int32_t y_offset = bounds.size.h / 2 - data->total_height_ani / 2;
   // lock main text position once laps go off screen
   if (prv_get_scrolling_enabled(data)) {
@@ -225,9 +226,10 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
     // print to string
     prv_format_duration_ms(buff_lap, NULL, sizeof(buff_lap), 0, data->epochs_ms[ii], true);
     // draw on screen
-    graphics_draw_text(ctx, buff_lap, data->font_small, GRect(5, y - 8, screen_width,
-      SCREEN_LAP_HEIGHT), GTextOverflowModeFill,
-      PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter), NULL);
+    graphics_draw_text(ctx, buff_lap, data->font_small,
+                       GRect(PBL_IF_RECT_ELSE(5, 15), y - 8, screen_width, SCREEN_LAP_HEIGHT),
+                       GTextOverflowModeFill,
+                       PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter), NULL);
   }
 
 #if defined(PBL_ROUND)
