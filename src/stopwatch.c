@@ -10,30 +10,14 @@
 #define MSEC_IN_HR 3600000
 
 #define DATA_MAX_LAP_COUNT 22
-#if defined(PBL_RECT)
-  #define SCREEN_LAP_HEIGHT 18
-#elif defined(PBL_ROUND)
-  #define SCREEN_LAP_HEIGHT 14
-#endif
+#define SCREEN_LAP_HEIGHT PBL_IF_ROUND_ELSE(14, 18)
 #define SCREEN_LAP_FONT_SIZE 12
-#if defined(PBL_RECT)
-  #define SCREEN_SCROLLING_OFF 30
-#elif defined(PBL_ROUND)
-  #define SCREEN_SCROLLING_OFF 86
-#endif
+#define SCREEN_SCROLLING_OFF PBL_IF_ROUND_ELSE(86, 30)
 #define SCREEN_SCROLL_STEP_SMALL 6
 #define SCREEN_SCROLL_STEP_LARGE 18
-#if defined(PBL_RECT)
-  #define SCREEN_BORDER_WIDTH 4
-#elif defined(PBL_ROUND)
-  #define SCREEN_BORDER_WIDTH 22
-#endif
+#define SCREEN_BORDER_WIDTH PBL_IF_ROUND_ELSE(22, 4)
 #define SCREEN_SPACING_WIDTH 4
-#if defined(PBL_RECT)
-  #define SCREEN_MAX_LAPS_BEFORE_SCROLLING 6
-#elif defined(PBL_ROUND)
-  #define SCREEN_MAX_LAPS_BEFORE_SCROLLING 5
-#endif
+#define SCREEN_MAX_LAPS_BEFORE_SCROLLING PBL_IF_ROUND_ELSE(5, 6)
 #ifdef PBL_COLOR
 #define HIGHLIGHT_COLOR GColorYellow
 #else
@@ -180,7 +164,7 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // get WindowData pointer from layer data
   WindowData *data = (*(WindowData**)layer_get_data(layer));
 
-  GRect bounds = layer_get_bounds(layer);
+  const GRect bounds = layer_get_bounds(layer);
 
   // get duration
   int64_t duration = prv_get_epoch_ms();
@@ -246,16 +230,16 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
       PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter), NULL);
   }
 
-  #if defined(PBL_ROUND)
+#if defined(PBL_ROUND)
     // Draw a box under the laps to cover the bottom laps
     graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
     graphics_fill_rect(ctx, GRect(0, 156, 180, 24), 0, GCornerNone);
-  #endif
+#endif
 
   // draw the text
   graphics_context_set_fill_color(ctx, HIGHLIGHT_COLOR);
-  graphics_fill_rect(ctx, GRect(0, 0, screen_width, y_offset + main_font_size + 5),
-    1, GCornerNone);
+  graphics_fill_rect(ctx,
+                     GRect(0, 0, screen_width, y_offset + main_font_size + 5), 1, GCornerNone);
   graphics_context_set_fill_color(ctx, GColorBlack);
   rendering_draw_text(ctx, buff_main, sizeof(buff_main), main_font_size,
     GPoint(x_offset, y_offset));
@@ -273,13 +257,10 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   else {
     strftime(buff, sizeof(buff), "%l:%M", tick_time);
   }
-  #ifdef PBL_RECT
-    graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
-      GRect(0, -3, screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
-  #elif PBL_ROUND
-    graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
-      GRect(0, 1, bounds.size.w, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
-  #endif
+  const int time_y_offset = PBL_IF_RECT_ELSE(-3, 1);
+  const int time_screen_width = PBL_IF_RECT_ELSE(screen_width, bounds.size.w);
+  graphics_draw_text(ctx, buff, fonts_get_system_font(FONT_KEY_GOTHIC_14),
+    GRect(0, time_y_offset, time_screen_width, 20), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 }
 
 
