@@ -1,0 +1,159 @@
+{
+  "version": "1.2.0",
+  "author": "Pebble",
+  "private": true,
+  "dependencies": {},
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "characterRegex": "[0-9: .]",
+          "name": "FONT_LECO_REGULAR_SUBSET_16",
+          "file": "fonts/leco_regular_monospaced.otf"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "type": "bitmap",
+          "name": "ICON_DOWN",
+          "file": "images/icon_down_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_DOWN",
+          "file": "images/icon_down.png"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "memoryFormat": "1Bit",
+          "type": "bitmap",
+          "name": "ICON_LAP",
+          "file": "images/icon_lap_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_LAP",
+          "file": "images/icon_lap.png"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "memoryFormat": "1Bit",
+          "type": "bitmap",
+          "name": "ICON_PAUSE",
+          "file": "images/icon_pause_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_PAUSE",
+          "file": "images/icon_pause.png"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "memoryFormat": "1Bit",
+          "type": "bitmap",
+          "name": "ICON_PLAY",
+          "file": "images/icon_play_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_PLAY",
+          "file": "images/icon_play.png"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "memoryFormat": "1Bit",
+          "type": "bitmap",
+          "name": "ICON_RESET",
+          "file": "images/icon_reset_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_RESET",
+          "file": "images/icon_reset.png"
+        },
+        {
+          "targetPlatforms": [
+            "aplite",
+            "diorite"
+          ],
+          "memoryFormat": "1Bit",
+          "type": "bitmap",
+          "name": "ICON_UP",
+          "file": "images/icon_up_bw.png"
+        },
+        {
+          "targetPlatforms": [
+            "basalt",
+            "chalk"
+          ],
+          "type": "bitmap",
+          "name": "ICON_UP",
+          "file": "images/icon_up.png"
+        },
+        {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "IMAGE_ICON",
+          "file": "images/system_icon.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "14bd9cd3-14dc-4b81-bd58-2f1fb9b57978",
+    "messageKeys": {},
+    "enableMultiJS": false,
+    "displayName": "Stopwatch",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": []
+  },
+  "name": "Stopwatch"
+}

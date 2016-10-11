@@ -1,3 +1,4 @@
 build
 .lock-waf*
 .DS_Store
+node_modules/
