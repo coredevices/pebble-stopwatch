@@ -396,6 +396,59 @@ static void prv_click_config_provider(void *context) {
 // Loading/Unloading
 //
 
+// update app glance
+static void prv_update_app_glance(AppGlanceReloadSession *session, size_t limit, void *context) {
+  // Ensure we have sufficient slices
+  if (limit < 1) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Error: app needs %d slices (%zu available)", 1, limit);
+  }
+
+  WindowData *data = (WindowData*)context;
+
+  // Stopped -> no Status
+  if(data->epochs_ms[CurrentTime] == 0){
+    return;
+  }
+
+  time_t expiration_time = APP_GLANCE_SLICE_NO_EXPIRATION;
+  char buff_glance[50] = "";
+
+  // Running
+  if(data->epochs_ms[CurrentTime] > 0){
+    snprintf(buff_glance, sizeof(buff_glance), "{time_since(%lld)|format('%%0fR:%%0S')}", data->epochs_ms[CurrentTime]/1000);
+  }
+  // Paused
+  else if(data->epochs_ms[CurrentTime] < 0){
+    // expiration if paused > 2 hours
+    expiration_time = time(NULL) + SECONDS_PER_HOUR * 2; 
+
+    // get duration
+    int64_t duration = prv_get_epoch_ms();
+    duration -= (data->epochs_ms[CurrentTime] + duration) % duration;
+
+    // format to text
+    char buff_main[15];
+    char buff_ms[15];
+    prv_format_duration_ms(buff_main, buff_ms, sizeof(buff_main), sizeof(buff_ms), duration, false);
+    snprintf(buff_glance, sizeof(buff_glance), "%s.%s", buff_main, buff_ms);
+  }
+
+  // Create the slice
+  const AppGlanceSlice slice = {
+    .layout = {
+      .icon = APP_GLANCE_SLICE_DEFAULT_ICON,
+      .subtitle_template_string = buff_glance
+    },
+    .expiration_time = expiration_time
+  };
+
+  // add the slice, and check the result
+  AppGlanceResult result = app_glance_add_slice(session, slice);
+  if (result != APP_GLANCE_RESULT_SUCCESS) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error adding AppGlanceSlice: %d", result);
+  }
+}
+
 // save persistent storage
 static void prv_save_persistent_storage(WindowData *data) {
   // write out data and storage version
@@ -443,6 +496,8 @@ static void prv_window_load(Window *window) {
   if (data) {
     // load persistent state
     prv_load_persistent_storage(data);
+    // clear appglance
+    app_glance_reload(NULL, NULL);
     // load resources
     data->font_small = fonts_load_custom_font(
       resource_get_handle(RESOURCE_ID_FONT_LECO_REGULAR_SUBSET_16));
@@ -488,6 +543,8 @@ static void prv_window_unload(Window *window) {
   if (data) {
     // save persistent storage
     prv_save_persistent_storage(data);
+    // update appglance
+    app_glance_reload(prv_update_app_glance, data);
     // destroy visuals
     action_bar_layer_destroy(data->action_bar);
     layer_destroy(data->drawing_layer);
