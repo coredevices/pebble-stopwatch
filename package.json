@@ -11,6 +11,12 @@
     "resources": {
       "media": [
         {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "IMAGE_ICON",
+          "file": "images/system_icon.png"
+        },
+        {
           "type": "font",
           "characterRegex": "[0-9: .]",
           "name": "FONT_LECO_REGULAR_SUBSET_16",
@@ -128,12 +134,6 @@
           "type": "bitmap",
           "name": "ICON_UP",
           "file": "images/icon_up.png"
-        },
-        {
-          "menuIcon": true,
-          "type": "bitmap",
-          "name": "IMAGE_ICON",
-          "file": "images/system_icon.png"
         }
       ]
     },
