@@ -23,114 +23,31 @@
           "file": "fonts/leco_regular_monospaced.otf"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "type": "bitmap",
-          "name": "ICON_DOWN",
-          "file": "images/icon_down_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_DOWN",
           "file": "images/icon_down.png"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "memoryFormat": "1Bit",
-          "type": "bitmap",
-          "name": "ICON_LAP",
-          "file": "images/icon_lap_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_LAP",
           "file": "images/icon_lap.png"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "memoryFormat": "1Bit",
-          "type": "bitmap",
-          "name": "ICON_PAUSE",
-          "file": "images/icon_pause_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_PAUSE",
           "file": "images/icon_pause.png"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "memoryFormat": "1Bit",
-          "type": "bitmap",
-          "name": "ICON_PLAY",
-          "file": "images/icon_play_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_PLAY",
           "file": "images/icon_play.png"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "memoryFormat": "1Bit",
-          "type": "bitmap",
-          "name": "ICON_RESET",
-          "file": "images/icon_reset_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_RESET",
           "file": "images/icon_reset.png"
         },
         {
-          "targetPlatforms": [
-            "aplite",
-            "diorite"
-          ],
-          "memoryFormat": "1Bit",
-          "type": "bitmap",
-          "name": "ICON_UP",
-          "file": "images/icon_up_bw.png"
-        },
-        {
-          "targetPlatforms": [
-            "basalt",
-            "chalk"
-          ],
           "type": "bitmap",
           "name": "ICON_UP",
           "file": "images/icon_up.png"
