@@ -400,10 +400,11 @@ static void prv_click_config_provider(void *context) {
 static void prv_update_app_glance(AppGlanceReloadSession *session, size_t limit, void *context) {
   // Ensure we have sufficient slices
   if (limit < 1) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Error: app needs %d slices (%zu available)", 1, limit);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error: app needs %d slices (%zu available)", 1, limit);
+    return;
   }
 
-  WindowData *data = (WindowData*)context;
+  WindowData *data = context;
 
   // Stopped -> no Status
   if(data->epochs_ms[CurrentTime] == 0){
@@ -411,7 +412,7 @@ static void prv_update_app_glance(AppGlanceReloadSession *session, size_t limit,
   }
 
   time_t expiration_time = APP_GLANCE_SLICE_NO_EXPIRATION;
-  char buff_glance[50] = "";
+  char buff_glance[50] = {0};
 
   // Running
   if(data->epochs_ms[CurrentTime] > 0){
@@ -430,13 +431,12 @@ static void prv_update_app_glance(AppGlanceReloadSession *session, size_t limit,
     char buff_main[15];
     char buff_ms[15];
     prv_format_duration_ms(buff_main, buff_ms, sizeof(buff_main), sizeof(buff_ms), duration, false);
-    snprintf(buff_glance, sizeof(buff_glance), "%s.%s", buff_main, buff_ms);
+    snprintf(buff_glance, sizeof(buff_glance), "%s%s%s", buff_main, strlen(buff_main)>3 ? "." : "", buff_ms);
   }
 
   // Create the slice
   const AppGlanceSlice slice = {
     .layout = {
-      .icon = APP_GLANCE_SLICE_DEFAULT_ICON,
       .subtitle_template_string = buff_glance
     },
     .expiration_time = expiration_time
@@ -496,8 +496,6 @@ static void prv_window_load(Window *window) {
   if (data) {
     // load persistent state
     prv_load_persistent_storage(data);
-    // clear appglance
-    app_glance_reload(NULL, NULL);
     // load resources
     data->font_small = fonts_load_custom_font(
       resource_get_handle(RESOURCE_ID_FONT_LECO_REGULAR_SUBSET_16));
