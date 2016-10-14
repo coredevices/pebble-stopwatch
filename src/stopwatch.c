@@ -251,10 +251,9 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // draw time
   time_t tmp_sec = time(NULL);
   struct tm *tick_time = localtime(&tmp_sec);
-  tick_time->tm_hour = (tick_time->tm_hour % 12 == 0) ? 12 : (tick_time->tm_hour % 12);
   char buff[] = "00:00";
   if (clock_is_24h_style()) {
-    strftime(buff, sizeof(buff), "%k:%M", tick_time);
+    strftime(buff, sizeof(buff), "%H:%M", tick_time);
   }
   else {
     strftime(buff, sizeof(buff), "%l:%M", tick_time);
@@ -396,6 +395,59 @@ static void prv_click_config_provider(void *context) {
 // Loading/Unloading
 //
 
+// update app glance
+static void prv_update_app_glance(AppGlanceReloadSession *session, size_t limit, void *context) {
+  // Ensure we have sufficient slices
+  if (limit < 1) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error: app needs %d slices (%zu available)", 1, limit);
+    return;
+  }
+
+  WindowData *data = context;
+
+  // Stopped -> no Status
+  if(data->epochs_ms[CurrentTime] == 0){
+    return;
+  }
+
+  time_t expiration_time = APP_GLANCE_SLICE_NO_EXPIRATION;
+  char buff_glance[50] = {0};
+
+  // Running
+  if(data->epochs_ms[CurrentTime] > 0){
+    snprintf(buff_glance, sizeof(buff_glance), "{time_since(%lld)|format('%%0fR:%%0S')}", data->epochs_ms[CurrentTime]/1000);
+  }
+  // Paused
+  else if(data->epochs_ms[CurrentTime] < 0){
+    // expiration if paused > 2 hours
+    expiration_time = time(NULL) + SECONDS_PER_HOUR * 2; 
+
+    // get duration
+    int64_t duration = prv_get_epoch_ms();
+    duration -= (data->epochs_ms[CurrentTime] + duration) % duration;
+
+    // format to text
+    char buff_main[15];
+    char buff_ms[15];
+    prv_format_duration_ms(buff_main, buff_ms, sizeof(buff_main), sizeof(buff_ms), duration, false);
+    snprintf(buff_glance, sizeof(buff_glance), "%s%s%s", buff_main, strlen(buff_main)>3 ? "." : "", buff_ms);
+  }
+
+  // Create the slice
+  const AppGlanceSlice slice = {
+    .layout = {
+      .subtitle_template_string = buff_glance
+    },
+    .expiration_time = expiration_time
+  };
+
+  // add the slice, and check the result
+  AppGlanceResult result = app_glance_add_slice(session, slice);
+  if (result != APP_GLANCE_RESULT_SUCCESS) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error adding AppGlanceSlice: %d", result);
+  }
+}
+
 // save persistent storage
 static void prv_save_persistent_storage(WindowData *data) {
   // write out data and storage version
@@ -488,6 +540,8 @@ static void prv_window_unload(Window *window) {
   if (data) {
     // save persistent storage
     prv_save_persistent_storage(data);
+    // update appglance
+    app_glance_reload(prv_update_app_glance, data);
     // destroy visuals
     action_bar_layer_destroy(data->action_bar);
     layer_destroy(data->drawing_layer);
