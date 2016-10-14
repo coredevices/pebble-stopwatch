@@ -251,10 +251,9 @@ static void prv_layer_draw(Layer *layer, GContext *ctx) {
   // draw time
   time_t tmp_sec = time(NULL);
   struct tm *tick_time = localtime(&tmp_sec);
-  tick_time->tm_hour = (tick_time->tm_hour % 12 == 0) ? 12 : (tick_time->tm_hour % 12);
   char buff[] = "00:00";
   if (clock_is_24h_style()) {
-    strftime(buff, sizeof(buff), "%k:%M", tick_time);
+    strftime(buff, sizeof(buff), "%H:%M", tick_time);
   }
   else {
     strftime(buff, sizeof(buff), "%l:%M", tick_time);
