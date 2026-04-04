@@ -57,7 +57,7 @@
     "projectType": "native",
     "uuid": "14bd9cd3-14dc-4b81-bd58-2f1fb9b57978",
     "messageKeys": {},
-    "enableMultiJS": false,
+    "enableMultiJS": true,
     "displayName": "Stopwatch",
     "watchapp": {
       "onlyShownOnCommunication": false,
@@ -68,7 +68,9 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery",
+      "gabbro"
     ],
     "capabilities": []
   },
