@@ -1,3 +1,5 @@
+> **Moved:** Stopwatch now lives in [coredevices/pebble-apps/stopwatch](https://github.com/coredevices/pebble-apps/tree/main/stopwatch). This repository is archived.
+
 # pebble-stopwatch
 Simple pebble stopwatch built to be published by Pebble in the store.
 
